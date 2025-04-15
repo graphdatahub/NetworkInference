@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gso"
+version = "0.1.0"
+description = "Learning Graph Shift Operators"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "Esteban Nocet-Binois", email = "en4624@princeton.edu"}
+]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
+[tool.ruff]
+line-length = 90
+extend-select = ["B", "I", "RUF", "UP"]
+include = ["src/gso/**/*.py", "src/gso/**/*.pyi", "src/gso/**/*.ipynb"]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_unused_ignores = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unreachable = true
+allow_untyped_decorators = true
+pretty = true
+files = ["src/gso"]

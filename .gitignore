@@ -1,0 +1,91 @@
+# Build directories
+build/
+build-*/
+out/
+cmake-build-*/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
+# IDE-specific files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj*
+.vscode/
+
+# Linux files
+*~
+.trash/
+.cache/
+*.lock
+
+# Executable
+eigen_project
+
+# Backup files
+*~
+*.bak
+
+# Logs
+*.log
+
+# Nvim
+*.swp
+*.swo
+
+# LaTeX artifacts
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.bbl
+*.blg
+*.idx
+*.ind
+*.out
+*.synctex.gz

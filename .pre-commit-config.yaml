@@ -1,0 +1,61 @@
+ci:
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  autofix_commit_msg: "style: pre-commit fixes"
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+    - id: check-added-large-files
+    - id: check-case-conflict
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: check-yaml
+    - id: debug-statements
+    - id: end-of-file-fixer
+    - id: mixed-line-ending
+    - id: requirements-txt-fixer
+    - id: trailing-whitespace
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.11.3
+  hooks:
+    - id: ruff
+      args:
+        - --fix
+        - --show-fixes
+      types_or: [python, pyi, jupyter]
+      files: ^src/gso/
+    - id: ruff-format
+      types_or: [python, pyi, jupyter]
+      files: ^src/gso/
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.15.0
+  hooks:
+    - id: mypy
+      language_version: python3.12
+      files: ^src/gso/
+
+- repo: https://github.com/pre-commit/mirrors-prettier
+  rev: v3.1.0
+  hooks:
+    - id: prettier
+      name: prettier
+      entry: prettier --write
+      language: node
+      files: '\.(md|tex)$'
+      require_serial: false
+      additional_dependencies:
+        - prettier@4.0.0-alpha.8
+        - prettier-plugin-latex
+
+- repo: local
+  hooks:
+    - id: nox
+      name: nox
+      entry: bash -c '[ "$CI" != "true" ] && nox || echo "Skipping nox in CI"'
+      language: system
+      types: [python]
+      pass_filenames: false
+      files: ^(src/|noxfile.py|requirements.txt)
