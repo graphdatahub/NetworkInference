@@ -1,5 +1,6 @@
 # TODO: 
 # - Review Kuramoto model
+# - Try to make it work for sparse Laplacian
 # - Implement other classes of noise
 # - Implement Gaussian signals with time correlation
 # - Implement other non-Gaussian models
