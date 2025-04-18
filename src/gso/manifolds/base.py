@@ -17,7 +17,8 @@ class Manifold(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def sample(self, n_points: int, seed: int | None = None) -> PointCloud:
+    def sample(self, n_points: int, domain: tuple[float, float] = (-2.0, 2.0), 
+               tol: float = 1e-6, max_attempts: int = 1000) -> PointCloud:
         """
         Samples points (approximately) uniformly from the manifold.
 

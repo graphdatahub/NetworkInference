@@ -1,3 +1,9 @@
+# TODO: 
+# - Review Kuramoto model
+# - Implement other classes of noise
+# - Implement Gaussian signals with time correlation
+# - Implement other non-Gaussian models
+
 import numpy as np
 import numpy.typing as npt
 from ..core.types import (
@@ -7,10 +13,16 @@ from ..core.types import (
 )
 from scipy.linalg import pinvh
 from scipy.sparse import csr_matrix, issparse
+from dataclasses import dataclass
 
 
+@dataclass
 class SignalGenerator:
     """Generates graph signals using different models."""
+    random_seed: int | None = None
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(random_seed={self.random_seed})"
 
     def generate_gaussian_signal(
         self,
@@ -18,7 +30,6 @@ class SignalGenerator:
         n_samples: int,
         mean: npt.NDArray[np.float64] | None = None,
         noise_sigma: float = 0.0,
-        seed: int | None = None,
     ) -> GraphSignals:
         """
         Generates signals from a Gaussian Markov Random Field (GMRF) defined
@@ -41,7 +52,7 @@ class SignalGenerator:
         if issparse(laplacian):
             L_dense = laplacian.toarray()
         else:
-            L_dense = np.asarray(laplacian)  # Ensure it's a numpy array
+            L_dense = np.asarray(laplacian)
 
         n_nodes = L_dense.shape[0]
         if L_dense.shape != (n_nodes, n_nodes):
@@ -57,17 +68,13 @@ class SignalGenerator:
                     f"with n_nodes ({n_nodes})."
                 )
 
-        # Use pseudo-inverse of Laplacian to define covariance
-        # Add small ridge to improve condition number before pinvh if needed
         ridge = 1e-10
         try:
             covariance = pinvh(L_dense + ridge * np.identity(n_nodes))
-            # Ensure symmetry (pinvh should return symmetric, but for safety)
-            covariance = (covariance + covariance.T) / 2.0
         except np.linalg.LinAlgError:
             raise RuntimeError("Failed to compute pseudo-inverse of the Laplacian.")
 
-        rng = np.random.default_rng(seed)
+        rng = np.random.default_rng(self.random_seed)
 
         # Sample from multivariate normal
         signals: GraphSignals = rng.multivariate_normal(
@@ -88,7 +95,7 @@ class SignalGenerator:
         coupling_K: float,
         dt: float = 0.1,
         natural_frequencies: npt.NDArray[np.float64] | None = None,
-        initial_phases: npt.NDArray[np.float64] | PointCloud | None = None,
+        initial_phases: PointCloud | None = None,
         seed: int | None = None,
     ) -> GraphSignals:
         """

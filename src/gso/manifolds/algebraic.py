@@ -3,7 +3,6 @@
 # - Accelerate with numba
 # - Write mcmc_sample
 
-import abc
 import numpy as np
 import sympy as sp
 from typing import Optional
@@ -35,6 +34,9 @@ class AlgebraicManifold(Manifold):
         self.jacobian = self._compute_jacobian()
         self._compile_functions()
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(num_equations={self.num_equations}, num_variables={self.num_variables}, max_degree={self.max_degree}, random_seed={self.random_seed})"
+
     @property
     def ambient_dim(self) -> int:
         return self.num_variables
@@ -60,7 +62,7 @@ class AlgebraicManifold(Manifold):
         pass
 
     def sample(self, n_points: int, domain: tuple[float, float] = (-2.0, 2.0), 
-                        tol: float = 1e-6, max_attempts: int = 1000) -> PointCloud:
+               tol: float = 1e-6, max_attempts: int = 1000) -> PointCloud:
         """Uniform sampling via adaptive slicing (Dufresne et al., 2018)"""
         points = []
         d = self.intrinsic_dim
