@@ -1,3 +1,8 @@
+# TODO: 
+# - Debug uniform_sampling
+# - Accelerate with numba
+# - Write mcmc_sample
+
 import abc
 import numpy as np
 import sympy as sp
@@ -54,9 +59,6 @@ class AlgebraicManifold(Manifold):
         """Manifold-adjusted Langevin MCMC (Cheng et al. 2022)"""
         pass
 
-    # def uniform_sampling(self, n_points: int, domain: tuple[float, float] = (-2.0, 2.0), 
-    #                     tol: float = 1e-6, max_attempts: int = 1000) -> np.ndarray:
-        
     def sample(self, n_points: int, domain: tuple[float, float] = (-2.0, 2.0), 
                         tol: float = 1e-6, max_attempts: int = 1000) -> np.ndarray:
         """Uniform sampling via adaptive slicing (Dufresne et al., 2018)"""
@@ -144,7 +146,7 @@ class AlgebraicManifold(Manifold):
         self.metric_func = sp.lambdify(self.variables, metric_symbolic, 'numpy')
 
     def _is_valid_point(self, x: np.ndarray, domain: tuple[float, float], tol: float) -> bool:
-        """Multi-faceted validity check."""
+        """Complete validity check."""
         return (
             self._in_domain(x, domain) and
             self._equations_satisfied(x, tol) and
