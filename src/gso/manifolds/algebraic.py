@@ -9,7 +9,7 @@ import sympy as sp
 from typing import Optional
 from scipy.optimize import fsolve, root
 from dataclasses import dataclass, field
-from ..core.types import PointCloud
+from ..core.types import PointCloud, Matrix
 from .base import Manifold
 
 @dataclass
@@ -60,7 +60,7 @@ class AlgebraicManifold(Manifold):
         pass
 
     def sample(self, n_points: int, domain: tuple[float, float] = (-2.0, 2.0), 
-                        tol: float = 1e-6, max_attempts: int = 1000) -> np.ndarray:
+                        tol: float = 1e-6, max_attempts: int = 1000) -> PointCloud:
         """Uniform sampling via adaptive slicing (Dufresne et al., 2018)"""
         points = []
         d = self.intrinsic_dim
@@ -103,7 +103,7 @@ class AlgebraicManifold(Manifold):
         delta = p2 - p1
         return np.sqrt(delta @ G @ delta)  # Riemannian norm squared
 
-    def compute_geodesics(self, points: np.ndarray) -> np.ndarray:
+    def compute_geodesics(self, points: PointCloud) -> Matrix:
         """Compute all pairwise geodesic distances."""
         n = len(points)
         distances = np.zeros((n, n))
