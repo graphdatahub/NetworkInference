@@ -1,5 +1,4 @@
 # TODO:
-# - Debug uniform_sampling
 # - Accelerate with numba
 # - Write mcmc_sample
 
@@ -139,13 +138,8 @@ class AlgebraicManifold(Manifold):
 
     def _compile_functions(self) -> None:
         """Compile symbolic expressions to numeric functions."""
-        # Equations evaluation
         self.eq_func = sp.lambdify(self.variables, self.equations, "numpy")
-
-        # Jacobian evaluation
         self.jacobian_func = sp.lambdify(self.variables, self.jacobian, "numpy")
-
-        # Metric tensor remains as before
         metric_symbolic = self.jacobian.T * self.jacobian
         self.metric_func = sp.lambdify(self.variables, metric_symbolic, "numpy")
 
