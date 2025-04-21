@@ -25,7 +25,7 @@ def typecheck(session):
 @nox.session(python=python_versions)
 def test(session):
     """Run unit tests"""
-    session.install(".[test]")
+    session.install("-e", ".[test]")
     session.run("pytest", "-v", str(tests_dir))
 
 @nox.session

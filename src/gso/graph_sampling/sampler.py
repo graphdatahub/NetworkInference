@@ -1,14 +1,16 @@
-# TODO: Integrate case without structure (knn) and:
-# - try optimize by not computing distances for zero-edges
-# - make sure of the meaning of taking geodesics to construct knn (and 
+# TODO:
+# - integrate knn case, and add possible extra args, for possible future manifolds, with other args (or even just calling mcmc, etc.)
+# - make sure of the meaning of taking geodesics to construct knn (and
 #   what it implies for cases of input structure not taking manifold as part of its construction)
 
+
 import numpy as np
-from ..core.types import Matrix, PointCloud, SparseMatrix
-from ..manifolds.base import Manifold
-from scipy.sparse import csr_matrix, coo_matrix, dok_matrix
+from scipy.sparse import coo_matrix, csr_matrix
 from scipy.sparse.csgraph import laplacian as sparse_laplacian
-from typing import Optional
+
+from ..core import Matrix, PointCloud, SparseMatrix
+from ..manifolds import Manifold
+
 
 class GraphSampler:
     """
@@ -16,10 +18,12 @@ class GraphSampler:
     a Gaussian kernel scaled for Laplace-Beltrami convergence.
     """
 
-    def __init__(self, 
-                 epsilon_scale_factor: float = 1.0,
-                 epsilon_scale_power_denom_const: float = 4.0,
-                 min_epsilon_factor: float = 1e-4):
+    def __init__(
+        self,
+        epsilon_scale_factor: float = 1.0,
+        epsilon_scale_power_denom_const: float = 4.0,
+        min_epsilon_factor: float = 1e-4,
+    ):
         """
         Args:
             epsilon_scale_factor: Multiplicative factor C_M in epsilon scaling.
@@ -36,33 +40,37 @@ class GraphSampler:
             raise ValueError("epsilon_scale_power_denom_const must be positive.")
         if min_epsilon_factor < 0:
             raise ValueError("min_epsilon_factor cannot be negative.")
-        
+
         self.epsilon_scale_factor = epsilon_scale_factor
         self.epsilon_scale_power_denom_const = epsilon_scale_power_denom_const
         self.min_epsilon_factor = min_epsilon_factor
 
-    def _calculate_epsilon(self, n_points: int, avg_degree: float, manifold_dim: int) -> float:
+    def _calculate_epsilon(
+        self, n_points: int, avg_degree: float, manifold_dim: int
+    ) -> float:
         """Calculates the Gaussian kernel bandwidth epsilon."""
-        log_n = np.log(max(2, n_points))
+        log_n = np.log(max(2, n_points))  # avoid limit case n=1
+        log_n_over_n = log_n / n_points
 
         if avg_degree < log_n:
             # Use avg_degree as lower-bound stabilizer
-            scaling_base = max(log_n/n_points, avg_degree/n_points)
+            scaling_base = max(log_n_over_n, avg_degree / n_points)
         else:
-            scaling_base = log_n/n_points
-        
-        scaling_base = max(0.0, log_n/n_points) + self.min_epsilon_factor
-        exponent = 2/(manifold_dim + self.epsilon_scale_power_denom_const)
-        return self.epsilon_scale_factor * (scaling_base**exponent)
+            scaling_base = log_n_over_n
+
+        scaling_base += self.min_epsilon_factor
+        exponent = 2 / (manifold_dim + self.epsilon_scale_power_denom_const)
+        eps: float = self.epsilon_scale_factor * (scaling_base**exponent)
+        return eps
 
     def _generate_knn_structure(self, geo_dists: Matrix) -> SparseMatrix:
         """Generates symmetric kNN graph with k ~ log(n) for sparsity"""
         n_nodes = geo_dists.shape[0]
         k = max(1, int(np.log(n_nodes)))
-        
+
         # Find k nearest neighbors (excluding self)
-        knn_indices = np.argpartition(geo_dists, k+1, axis=1)[:, 1:k+1]
-        
+        knn_indices = np.argpartition(geo_dists, k + 1, axis=1)[:, 1 : k + 1]
+
         # Build symmetric adjacency matrix
         rows = np.repeat(np.arange(n_nodes), k)
         cols = knn_indices.flatten()
@@ -70,11 +78,12 @@ class GraphSampler:
         adj = coo_matrix((data, (rows, cols)), shape=(n_nodes, n_nodes)).tocsr()
         return adj.maximum(adj.T)  # Symmetrize
 
-    def create_weighted_graph(self,
-                            manifold: Manifold,
-                            n_nodes: Optional[int] = None,
-                            structure_matrix: Optional[SparseMatrix] = None
-                            ) -> tuple[SparseMatrix, SparseMatrix, PointCloud, float]:
+    def create_weighted_graph(
+        self,
+        manifold: Manifold,
+        n_nodes: int | None = None,
+        structure_matrix: SparseMatrix | None = None,
+    ) -> tuple[SparseMatrix, SparseMatrix, PointCloud, float]:
         """
         Generates a weighted graph Laplacian based on manifold samples and a
         fixed connectivity structure (input or kNN model).
@@ -105,10 +114,13 @@ class GraphSampler:
         if structure_matrix is not None:
             if structure_matrix.shape[0] != structure_matrix.shape[1]:
                 raise ValueError("Structure matrix must be square")
-            n_nodes: int = structure_matrix.shape[0]
+            n_nodes: int = structure_matrix.shape[0]  # type: ignore[no-redef]
         elif n_nodes is None:
             raise ValueError("Must provide either n_nodes or structure_matrix")
-        
+
+        assert n_nodes is not None
+        assert structure_matrix is not None
+
         # 1. Sample points and compute geodesics
         point_cloud = manifold.sample(n_nodes)
         geo_dists = manifold.compute_geodesics(point_cloud)
@@ -125,46 +137,44 @@ class GraphSampler:
 
         # 4. Build weighted adjacency matrix
         rows, cols = structure_matrix.nonzero()
-        weights = np.exp(-geo_dists[rows, cols]**2 / epsilon)
+        weights = np.exp(-(geo_dists[rows, cols] ** 2) / epsilon)
         W = csr_matrix((weights, (rows, cols)), shape=(n_nodes, n_nodes))
 
         # 5. Symmetrize weights if needed
-        W = (W + W.T)/2  # Ensures symmetric weights
+        W = (W + W.T) / 2  # Ensures symmetric weights
 
         # 6. Construct combinatorial Laplacian
         L = sparse_laplacian(W, normed=False)
 
         return L, W, point_cloud, epsilon
 
-    def create_weighted_graph_from_structure(self,
-                            manifold: Manifold,
-                            structure_matrix: SparseMatrix = None, 
-                            to_symmetric: bool = True,
-                            normalized: bool = False
-                            ) -> tuple[SparseMatrix, SparseMatrix, PointCloud, float]:
+    def create_weighted_graph_from_structure(
+        self,
+        manifold: Manifold,
+        structure_matrix: SparseMatrix = None,
+        to_symmetric: bool = True,
+        normalized: bool = False,
+    ) -> tuple[SparseMatrix, SparseMatrix, PointCloud, float]:
         structure_matrix = structure_matrix.tocsr()
         n_nodes: int = structure_matrix.shape[0]
-        
+
         point_cloud = manifold.sample(n_nodes)
-        
+
         d = manifold.intrinsic_dim
         epsilon = self._calculate_epsilon(n_nodes, structure_matrix.mean(), d)
 
         # Weight all edges based on geodesic distance
         rows, cols = structure_matrix.nonzero()
         weights = []
-        for i, j in zip(rows, cols):
+        for i, j in zip(rows, cols, strict=False):
             dist = manifold.geodesic(point_cloud[i], point_cloud[j])
-            weights.append(np.exp(-dist**2 / epsilon))
+            weights.append(np.exp(-(dist**2) / epsilon))
 
-        W = csr_matrix(
-            (np.array(weights), (rows, cols)), 
-            shape=(n_nodes, n_nodes)
-        )
+        W = csr_matrix((np.array(weights), (rows, cols)), shape=(n_nodes, n_nodes))
 
         if to_symmetric:
-            W = (W + W.T)/2
-        
+            W = (W + W.T) / 2
+
         # Compute Laplacian: large weight = important commute time
         L = sparse_laplacian(W, normed=normalized, return_diag=False)
 

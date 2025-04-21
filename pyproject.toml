@@ -1,6 +1,18 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=64.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["gso*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src/tests"]
+addopts = "--import-mode=importlib"
 
 [project]
 name = "gso"
@@ -12,7 +24,11 @@ authors = [
     {name = "Esteban Nocet-Binois", email = "en4624@princeton.edu"}
 ]
 dependencies = [
-    "numpy>=1.24",
+    "numpy>=2.2",
+    "scipy>=1.15",
+    "sympy>=1.13",
+    "matplotlib>=3.10",
+    "plotly>=6.0"
 ]
 
 [project.optional-dependencies]
@@ -20,8 +36,10 @@ test = ["pytest>=7.0"]
 
 [tool.ruff]
 line-length = 90
+include = ["src/**/*.py", "src/**/*.pyi", "src/**/*.ipynb"]
+
+[tool.ruff.lint]
 extend-select = ["B", "I", "RUF", "UP"]
-include = ["src/gso/**/*.py", "src/gso/**/*.pyi", "src/gso/**/*.ipynb"]
 
 [tool.mypy]
 strict = true
@@ -34,4 +52,8 @@ warn_redundant_casts = true
 warn_unreachable = true
 allow_untyped_decorators = true
 pretty = true
-files = ["src/gso"]
+files = ["src/"]
+exclude = [
+    "^build/",
+    "^src/tests/",
+]

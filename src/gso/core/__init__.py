@@ -1,15 +1,21 @@
 from .types import (
-    PointCloud,
-    GraphSignals,
-    SparseMatrix,
+    Collection,
+    EdgeIndices,
     Matrix,
-    EdgeIndices
+    Point,
+    PointCloud,
+    Signal,
+    SparseMatrix,
+    Vector,
 )
 
 __all__ = [
-    'PointCloud',
-    'GraphSignals',
-    'SparseMatrix',
-    'Matrix',
-    'EdgeIndices'
+    "Collection",
+    "EdgeIndices",
+    "Matrix",
+    "Point",
+    "PointCloud",
+    "Signal",
+    "SparseMatrix",
+    "Vector",
 ]

@@ -5,6 +5,10 @@ Summary: Learning Graph Shift Operators
 Author-email: Esteban Nocet-Binois <en4624@princeton.edu>
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
-Requires-Dist: numpy>=1.24
+Requires-Dist: numpy>=2.2
+Requires-Dist: scipy>=1.15
+Requires-Dist: sympy>=1.13
+Requires-Dist: matplotlib>=3.10
+Requires-Dist: plotly>=6.0
 Provides-Extra: test
 Requires-Dist: pytest>=7.0; extra == "test"

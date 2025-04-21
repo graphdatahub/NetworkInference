@@ -10,6 +10,9 @@ src/gso/graph_sampling/__init__.py
 src/gso/graph_sampling/sampler.py
 src/gso/gso_learning/__init__.py
 src/gso/manifolds/__init__.py
+src/gso/manifolds/algebraic.py
 src/gso/manifolds/base.py
+src/gso/manifolds/visualize.py
 src/gso/signal_generation/__init__.py
 src/gso/signal_generation/generator.py
+src/tests/test_manifold.py

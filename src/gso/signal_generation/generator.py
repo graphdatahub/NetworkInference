@@ -1,25 +1,29 @@
-# TODO: 
+# TODO:
 # - Review Kuramoto model
-# - Try to make it work for sparse Laplacian
+# - Try to make `generate_gaussian_signal` work with sparse Laplacian
 # - Implement other classes of noise
 # - Implement Gaussian signals with time correlation
 # - Implement other non-Gaussian models
 
-import numpy as np
-import numpy.typing as npt
-from ..core.types import (
-    GraphSignals,
-    Matrix,
-    PointCloud,  # For optional initial phases based on coords
-)
-from scipy.linalg import pinvh
-from scipy.sparse import csr_matrix, issparse
 from dataclasses import dataclass
+
+import numpy as np
+from scipy.linalg import eigh, pinvh
+from scipy.sparse import csr_matrix, issparse
+
+from ..core import (
+    Collection,
+    Matrix,
+    PointCloud,
+    Signal,
+    Vector,
+)
 
 
 @dataclass
 class SignalGenerator:
     """Generates graph signals using different models."""
+
     random_seed: int | None = None
 
     def __repr__(self) -> str:
@@ -29,9 +33,11 @@ class SignalGenerator:
         self,
         laplacian: Matrix,
         n_samples: int,
-        mean: npt.NDArray[np.float64] | None = None,
+        mean: Vector | None = None,
         noise_sigma: float = 0.0,
-    ) -> GraphSignals:
+        ridge: float = 1e-10,
+        method: str = "SG",
+    ) -> Collection:
         """
         Generates signals from a Gaussian Markov Random Field (GMRF) defined
         by the graph Laplacian L (as precision matrix).
@@ -48,7 +54,7 @@ class SignalGenerator:
             seed: Optional random seed.
 
         Returns:
-            GraphSignals array of shape (n_samples, n_nodes).
+            Collection array of shape (n_samples, n_nodes).
         """
         if issparse(laplacian):
             L_dense = laplacian.toarray()
@@ -69,21 +75,34 @@ class SignalGenerator:
                     f"with n_nodes ({n_nodes})."
                 )
 
-        ridge = 1e-10
-        try:
-            covariance = pinvh(L_dense + ridge * np.identity(n_nodes))
-        except np.linalg.LinAlgError:
-            raise RuntimeError("Failed to compute pseudo-inverse of the Laplacian.")
+        # TODO: Check wich is faster
+        if method == "MG":  # Multivariate Gaussian density
+            try:
+                covariance = pinvh(L_dense + ridge * np.identity(n_nodes))
+            except np.linalg.LinAlgError as err:
+                raise RuntimeError(
+                    "Failed to compute pseudo-inverse of the Laplacian."
+                ) from err
 
-        rng = np.random.default_rng(self.random_seed)
+            rng = np.random.default_rng(self.random_seed)
 
-        # Sample from multivariate normal
-        signals: GraphSignals = rng.multivariate_normal(
-            mean=mean_vec, cov=covariance, size=n_samples, check_valid="warn"
-        )
+            # Sample from multivariate normal
+            signals: Collection = rng.multivariate_normal(
+                mean=mean_vec, cov=covariance, size=n_samples, check_valid="warn"
+            )
+        elif method == "SG":  # Spectral generation approach
+            np.random.seed(self.random_seed)
+            eigvals, eigvecs = eigh(L_dense)
+            scale = np.sqrt(1 / (eigvals + ridge))
+            coefs = np.random.normal(loc=0, scale=scale, size=(n_samples, len(scale)))
+            signals = coefs @ eigvecs.T
+        else:
+            raise ValueError("Use either MG or SG as method.")
 
         # Add optional observation noise
         if noise_sigma > 0:
+            if method != "MG":
+                rng = np.random.default_rng(self.random_seed)
             noise = rng.normal(scale=noise_sigma, size=signals.shape)
             signals += noise
 
@@ -93,19 +112,19 @@ class SignalGenerator:
         self,
         W: Matrix,
         n_timesteps: int,
-        coupling_K: float,
+        coupling_K: float = 1,
         dt: float = 0.1,
-        natural_frequencies: npt.NDArray[np.float64] | None = None,
-        initial_phases: PointCloud | None = None,
+        natural_frequencies: Vector | None = None,
+        initial_phases: Signal | PointCloud | None = None,
         seed: int | None = None,
-    ) -> GraphSignals:
+    ) -> Collection:
         """
         Simulates Kuramoto dynamics on a graph with weighted adjacency W.
 
         Args:
             W: Weighted adjacency matrix (n_nodes x n_nodes). Can be sparse or dense.
             n_timesteps: Number of time steps (m).
-            coupling_K: Coupling strength.
+            coupling_K: Coupling strength, on top of the weights.
             dt: Integration time step.
             natural_frequencies: Natural frequencies (n_nodes,). Defaults to random uniform(-0.5, 0.5).
             initial_phases: Initial phases (n_nodes,). Defaults to random uniform(0, 2*pi).
@@ -113,12 +132,12 @@ class SignalGenerator:
             seed: Optional random seed for frequency/phase initialization.
 
         Returns:
-            GraphSignals array of phases, shape (n_timesteps, n_nodes).
+            Collection array of phases, shape (n_timesteps, n_nodes).
         """
         if issparse(W):
-            W_sparse = W.tocsr()  # Ensure CSR for efficient row slicing if needed
+            W_sparse = W.tocsr()
         else:
-            W_sparse = csr_matrix(W)  # Convert dense to sparse
+            W_sparse = csr_matrix(W)
 
         n_nodes = W_sparse.shape[0]
         if W_sparse.shape != (n_nodes, n_nodes):
@@ -167,7 +186,7 @@ class SignalGenerator:
                 )
 
         # Store graph signals (phases over time)
-        graph_signals: GraphSignals = np.zeros((n_timesteps, n_nodes))
+        graph_signals: Collection = np.zeros((n_timesteps, n_nodes))
 
         # Simulation loop (Euler method)
         rows, cols = W_sparse.nonzero()
