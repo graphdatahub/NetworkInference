@@ -50,7 +50,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - "3.11"
+          - "3.12"
         runs-on:
           - ubuntu-latest
           - macOS-latest
@@ -84,4 +84,4 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: nox -s tests
+        run: nox -s test
