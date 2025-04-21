@@ -1,91 +1,119 @@
-# Build directories
-build/
-build-*/
-out/
-cmake-build-*/
+# Global Dotfile Exclusion (with exceptions)
+# ------------------------------------------
+.*
+!.gitignore
+!.pre-commit-config.yaml
+!.python-version
+!.profile
+!.version
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Allow directory structure but not files
+!.*/
 
-# Precompiled Headers
-*.gch
-*.pch
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Operating System Files
+# ----------------------
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# Fortran module files
-*.mod
-*.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# CMake
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-
-# IDE-specific files
-.vs/
-*.user
-*.userosscache
-*.sln.docstates
-*.vcxproj*
+# Editors/IDEs
+# ------------
+# VS Code
 .vscode/
+*.code-workspace
 
-# Linux files
-*~
-.trash/
-.cache/
-*.lock
 
-# Executable
-eigen_project
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
 
-# Backup files
-*~
-*.bak
 
-# Logs
-*.log
-
-# Nvim
+# Vim
 *.swp
 *.swo
+*.un~
+Session.vim
 
-# LaTeX artifacts
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+auto-save-list
+tramp
+.\#*
+
+
+# Python
+# ------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
+*.egg
+
+
+# Jupyter
+# -------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+
+# Virtual Environments
+# --------------------
+# Python
+**/venv/
+**/.venv/
+**/env/
+**/virtualenv/
+**/ENV/
+**/env.bak/
+**/venv.bak/
+**/conda-env/
+**/envs/
+**/virtualenvs/
+**/pyenv/
+**/pythonenv/
+**/Pipfile.lock
+**/poetry.lock
+uv.lock
+
+# LaTeX
+# -----
 *.aux
 *.log
-*.fls
-*.fdb_latexmk
+*.out
 *.toc
 *.lof
 *.lot
-*.nav
-*.snm
 *.bbl
 *.blg
-*.idx
-*.ind
-*.out
+*.fls
+*.fdb_latexmk
 *.synctex.gz
+*.xdv
+*.run.xml
+*.bcf
+*.thm
+*.loe
+*.lol
+
+
+# Miscellaneous
+# -------------
+node_modules/
+package-lock.json

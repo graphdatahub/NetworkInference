@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: "Lint for ${{ matrix.runs-on }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+
+    runs-on: "${{ matrix.runs-on }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: false
+
+      - name: Create and activate virtual environment
+        run: |
+          uv venv
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo ".venv\\Scripts" >> $GITHUB_PATH
+          else
+            echo ".venv/bin" >> $GITHUB_PATH
+          fi
+        shell: bash
+
+      - name: Install pre-commit
+        run: uv pip install pre-commit
+
+      - name: Run pre-commit
+        shell: bash
+        run: pre-commit run --all-files --show-diff-on-failure
+
+  tests:
+    name: "Tests on Python ${{ matrix.python-version }} for ${{ matrix.runs-on }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.11"
+        runs-on:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+
+    runs-on: "${{ matrix.runs-on }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: false
+          python-version: "${{ matrix.python-version }}"
+
+      - name: Create and activate virtual environment
+        run: |
+          uv venv
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo ".venv\\Scripts" >> $GITHUB_PATH
+          else
+            echo ".venv/bin" >> $GITHUB_PATH
+          fi
+        shell: bash
+
+      - name: Install package and test dependencies
+        run: uv pip install -e .[test]
+
+      - name: Install nox
+        run: uv pip install nox[uv]
+
+      - name: Run tests
+        shell: bash
+        run: nox -s tests
