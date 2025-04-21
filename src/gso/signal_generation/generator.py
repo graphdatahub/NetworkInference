@@ -1,9 +1,8 @@
 # TODO:
-# - Review Kuramoto model
 # - Try to make `generate_gaussian_signal` work with sparse Laplacian
 # - Implement other classes of noise
 # - Implement Gaussian signals with time correlation
-# - Implement other non-Gaussian models
+# - Implement other non-Gaussian generative models
 
 from dataclasses import dataclass
 
@@ -42,8 +41,7 @@ class SignalGenerator:
         Generates signals from a Gaussian Markov Random Field (GMRF) defined
         by the graph Laplacian L (as precision matrix).
 
-        Assumes x ~ N(mean, (L + delta*I)^-1) or N(mean, L^+) where L^+ is pseudoinverse.
-        Using pseudoinverse L^+ relates directly to intrinsic variations on the graph.
+        Generates x ~ N(mean, (L + delta*I)^-1) or N(mean, L^+) where L^+ is pseudoinverse.
 
         Args:
             laplacian: The graph Laplacian matrix (n_nodes x n_nodes).
@@ -51,7 +49,7 @@ class SignalGenerator:
             mean: Optional mean vector (n_nodes,). Defaults to zero vector.
             noise_sigma: Standard deviation of optional additive Gaussian noise
                          applied after sampling from the GMRF. Defaults to 0.
-            seed: Optional random seed.
+            ridge: Ridge term for numerical stability (considering L is singular).
 
         Returns:
             Collection array of shape (n_samples, n_nodes).
@@ -99,7 +97,7 @@ class SignalGenerator:
         else:
             raise ValueError("Use either MG or SG as method.")
 
-        # Add optional observation noise
+        # Optional: observation noise
         if noise_sigma > 0:
             if method != "MG":
                 rng = np.random.default_rng(self.random_seed)
@@ -115,8 +113,7 @@ class SignalGenerator:
         coupling_K: float = 1,
         dt: float = 0.1,
         natural_frequencies: Vector | None = None,
-        initial_phases: Signal | PointCloud | None = None,
-        seed: int | None = None,
+        initial_phases: Signal | PointCloud | None = None
     ) -> Collection:
         """
         Simulates Kuramoto dynamics on a graph with weighted adjacency W.
@@ -129,7 +126,6 @@ class SignalGenerator:
             natural_frequencies: Natural frequencies (n_nodes,). Defaults to random uniform(-0.5, 0.5).
             initial_phases: Initial phases (n_nodes,). Defaults to random uniform(0, 2*pi).
                             Can also be a PointCloud, where e.g. the first coordinate is used.
-            seed: Optional random seed for frequency/phase initialization.
 
         Returns:
             Collection array of phases, shape (n_timesteps, n_nodes).
@@ -147,7 +143,7 @@ class SignalGenerator:
         if dt <= 0:
             raise ValueError("Time step dt must be positive.")
 
-        rng = np.random.default_rng(seed)
+        rng = np.random.default_rng(self.random_seed)
 
         # Initialize natural frequencies (omega)
         if natural_frequencies is None:
@@ -164,9 +160,9 @@ class SignalGenerator:
         if initial_phases is None:
             phases = rng.uniform(0, 2 * np.pi, n_nodes)
         else:
-            # Allow initialization from point coordinates (e.g., first coordinate)
+            # Allow initialization from point coordinates (here taking first coordinate)
             init_ph = np.asarray(initial_phases)
-            if init_ph.ndim == 2 and init_ph.shape[0] == n_nodes:  # Looks like PointCloud
+            if init_ph.ndim == 2 and init_ph.shape[0] == n_nodes:  # PointCloud type
                 print(
                     "Warning: Initializing Kuramoto phases from first coordinate of input."
                 )
@@ -176,8 +172,8 @@ class SignalGenerator:
                 if max_ph > min_ph:
                     phases = 2 * np.pi * (phases - min_ph) / (max_ph - min_ph)
                 else:
-                    phases = np.zeros(n_nodes)  # All same coord -> zero phase
-            elif init_ph.shape == (n_nodes,):  # Looks like phase vector
+                    phases = np.zeros(n_nodes)  # all same coord -> zero phase
+            elif init_ph.shape == (n_nodes,):  # Phase vector type
                 phases = init_ph
             else:
                 raise ValueError(
@@ -195,18 +191,14 @@ class SignalGenerator:
         for t in range(n_timesteps):
             graph_signals[t, :] = phases
 
-            # Calculate phase differences efficiently using sparse structure
-            # sin(theta_j - theta_i)
+            # Interaction term for each node i: sum_j W_ij * sin(theta_j - theta_i)
             phase_diffs = phases[cols] - phases[rows]
             sin_phase_diffs = np.sin(phase_diffs)
-
-            # Interaction term for each node i: sum_j W_ij * sin(theta_j - theta_i)
-            # Need to aggregate contributions based on 'rows' index
             interaction = np.zeros(n_nodes)
-            np.add.at(interaction, rows, weights * sin_phase_diffs)  # Efficient summation
+            np.add.at(interaction, rows, weights * sin_phase_diffs)
 
             # Update phases
             dtheta_dt = omegas + coupling_K * interaction
-            phases = (phases + dtheta_dt * dt) % (2 * np.pi)  # Keep in [0, 2*pi]
+            phases = (phases + dtheta_dt * dt) % (2 * np.pi)  # keep in [0, 2*pi]
 
         return graph_signals
