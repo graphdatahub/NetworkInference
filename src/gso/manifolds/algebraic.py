@@ -16,10 +16,10 @@ from .base import Manifold
 class AlgebraicManifold(Manifold):
     """Represents a continuous algebraic manifold defined by polynomial equations."""
 
-    num_equations: int  # Number of polynomial equations (k)
-    num_variables: int  # Number of ambient space variables (n)
-    max_degree: int  # Maximum polynomial degree
-    random_seed: int | None = None  # Seed for reproducibility
+    num_equations: int
+    num_variables: int
+    max_degree: int
+    random_seed: int | None = None
 
     # Symbolic components
     variables: list[sp.Symbol] = field(init=False, repr=False)

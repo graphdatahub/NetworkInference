@@ -113,7 +113,7 @@ class SignalGenerator:
         coupling_K: float = 1,
         dt: float = 0.1,
         natural_frequencies: Vector | None = None,
-        initial_phases: Signal | PointCloud | None = None
+        initial_phases: Signal | PointCloud | None = None,
     ) -> Collection:
         """
         Simulates Kuramoto dynamics on a graph with weighted adjacency W.
