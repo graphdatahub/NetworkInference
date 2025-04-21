@@ -1,8 +1,7 @@
 # TODO:
-# - integrate knn case, and add possible extra args, for possible future manifolds, with other args (or even just calling mcmc, etc.)
-# - make sure of the meaning of taking geodesics to construct knn (and
-#   what it implies for cases of input structure not taking manifold as part of its construction)
-
+# - integrate knn case to sample directly
+# - add possible extra args to sample, for future manifolds with other args (or adding mcmc call)
+# - check geodesics to construct knn (and what it implies, also for cases with input structure)
 
 import numpy as np
 from scipy.sparse import coo_matrix, csr_matrix
@@ -76,7 +75,7 @@ class GraphSampler:
         cols = knn_indices.flatten()
         data = np.ones_like(rows)
         adj = coo_matrix((data, (rows, cols)), shape=(n_nodes, n_nodes)).tocsr()
-        return adj.maximum(adj.T)  # Symmetrize
+        return adj.maximum(adj.T)  # symmetrize
 
     def create_weighted_graph(
         self,
@@ -106,10 +105,10 @@ class GraphSampler:
 
         Returns:
             A tuple containing:
-            - L (Matrix): The computed combinatorial graph Laplacian (L = D - W).
+            - L (Matrix): The computed graph Laplacian.
             - W (Matrix): The weighted sparse adjacency matrix.
             - points (PointCloud): The sampled points used for weighting.
-            - epsilon (float): The computed kernel bandwidth epsilon used.
+            - epsilon (float): The computed kernel bandwidth.
         """
         if structure_matrix is not None:
             if structure_matrix.shape[0] != structure_matrix.shape[1]:
@@ -141,7 +140,7 @@ class GraphSampler:
         W = csr_matrix((weights, (rows, cols)), shape=(n_nodes, n_nodes))
 
         # 5. Symmetrize weights if needed
-        W = (W + W.T) / 2  # Ensures symmetric weights
+        W = (W + W.T) / 2
 
         # 6. Construct combinatorial Laplacian
         L = sparse_laplacian(W, normed=False)
