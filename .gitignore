@@ -11,8 +11,8 @@
 !.*/
 
 # Only add notebooks (and csv files globally)
-notebook/*
-!notebook/*.ipynb
+notebooks/*
+!notebooks/*.ipynb
 !*.csv
 
 # Operating System Files
