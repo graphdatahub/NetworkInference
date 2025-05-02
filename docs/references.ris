@@ -1,0 +1,309 @@
+TY  - JOUR
+TI  - From Time–Frequency to Vertex–Frequency and Back
+AU  - Stanković, Ljubiša
+AU  - Lerga, Jonatan
+AU  - Mandic, Danilo
+AU  - Brajović, Miloš
+AU  - Richard, Cédric
+AU  - Daković, Miloš
+T2  - Mathematics
+AB  - The paper presents an analysis and overview of vertex–frequency analysis, an emerging area in graph signal processing. A strong formal link of this area to classical time–frequency analysis is provided. Vertex–frequency localization-based approaches to analyzing signals on the graph emerged as a response to challenges of analysis of big data on irregular domains. Graph signals are either localized in the vertex domain before the spectral analysis is performed or are localized in the spectral domain prior to the inverse graph Fourier transform is applied. The latter approach is the spectral form of the vertex–frequency analysis, and it will be considered in this paper since the spectral domain for signal localization is well ordered and thus simpler for application to the graph signals. The localized graph Fourier transform is defined based on its counterpart, the short-time Fourier transform, in classical signal analysis. We consider various spectral window forms based on which these transforms can tackle the localized signal behavior. Conditions for the signal reconstruction, known as the overlap-and-add (OLA) and weighted overlap-and-add (WOLA) methods, are also considered. Since the graphs can be very large, the realizations of vertex–frequency representations using polynomial form localization have a particular significance. These forms use only very localized vertex domains, and do not require either the graph Fourier transform or the inverse graph Fourier transform, are computationally efficient. These kinds of implementations are then applied to classical time–frequency analysis since their simplicity can be very attractive for the implementation in the case of large time-domain signals. Spectral varying forms of the localization functions are presented as well. These spectral varying forms are related to the wavelet transform. For completeness, the inversion and signal reconstruction are discussed as well. The presented theory is illustrated and demonstrated on numerical examples.
+DA  - 2021/06/17/
+PY  - 2021
+DO  - 10.3390/math9121407
+DP  - DOI.org (Crossref)
+VL  - 9
+IS  - 12
+SP  - 1407
+J2  - Mathematics
+LA  - en
+SN  - 2227-7390
+UR  - https://www.mdpi.com/2227-7390/9/12/1407
+Y2  - 2024/12/09/15:51:57
+L1  - https://www.mdpi.com/2227-7390/9/12/1407/pdf?version=1623986332
+ER  -
+
+TY  - JOUR
+TI  - Graph Learning From Data Under Laplacian and Structural Constraints
+AU  - Egilmez, Hilmi E.
+AU  - Pavez, Eduardo
+AU  - Ortega, Antonio
+T2  - IEEE Journal of Selected Topics in Signal Processing
+DA  - 2017/09//
+PY  - 2017
+DO  - 10.1109/JSTSP.2017.2726975
+DP  - DOI.org (Crossref)
+VL  - 11
+IS  - 6
+SP  - 825
+EP  - 841
+J2  - IEEE J. Sel. Top. Signal Process.
+SN  - 1932-4553, 1941-0484
+UR  - http://ieeexplore.ieee.org/document/7979524/
+Y2  - 2024/11/25/19:45:46
+L1  - https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=7979524&ref=
+ER  -
+
+TY  - JOUR
+TI  - Kernel-Based Graph Learning From Smooth Signals: A Functional Viewpoint
+AU  - Pu, Xingyue
+AU  - Chau, Siu Lun
+AU  - Dong, Xiaowen
+AU  - Sejdinovic, Dino
+T2  - IEEE Transactions on Signal and Information Processing over Networks
+DA  - 2021///
+PY  - 2021
+DO  - 10.1109/TSIPN.2021.3059995
+DP  - DOI.org (Crossref)
+VL  - 7
+SP  - 192
+EP  - 207
+J2  - IEEE Trans. on Signal and Inf. Process. over Networks
+SN  - 2373-776X, 2373-7778
+ST  - Kernel-Based Graph Learning From Smooth Signals
+UR  - https://ieeexplore.ieee.org/document/9356326/
+Y2  - 2025/03/31/14:13:03
+L1  - https://arxiv.org/pdf/2008.10065
+ER  -
+
+TY  - JOUR
+TI  - Learning Heat Diffusion Graphs
+AU  - Thanou, Dorina
+AU  - Dong, Xiaowen
+AU  - Kressner, Daniel
+AU  - Frossard, Pascal
+T2  - IEEE Transactions on Signal and Information Processing over Networks
+DA  - 2017/09//
+PY  - 2017
+DO  - 10.1109/TSIPN.2017.2731164
+DP  - DOI.org (Crossref)
+VL  - 3
+IS  - 3
+SP  - 484
+EP  - 499
+J2  - IEEE Trans. on Signal and Inf. Process. over Networks
+SN  - 2373-776X, 2373-7778
+UR  - http://ieeexplore.ieee.org/document/7990049/
+Y2  - 2025/03/31/14:16:14
+L1  - https://arxiv.org/pdf/1611.01456
+ER  -
+
+TY  - JOUR
+TI  - Spatio-Temporal Signal Recovery Based on Low Rank and Differential Smoothness
+AU  - Mao, Xianghui
+AU  - Qiu, Kai
+AU  - Li, Tiejian
+AU  - Gu, Yuantao
+T2  - IEEE Transactions on Signal Processing
+AB  - The analysis of spatio-temporal signals plays an important role in various fields including sociology, climatology, and environmental studies, etc. Due to the abrupt breakdown of the sensors in the sensor network, there always are missing entries in the observed spatio-temporal signals. In this paper, we study the problem of recovering spatio-temporal signals from partially known entries. Based on both the global and local correlated property of spatio-temporal signals, we propose a low rank and differential smoothness based recovery method (LRDS), which novelly introduces the differential smooth prior of time-varying graph signals to the field of spatio-temporal signal analysis. The performance of the proposed method is analyzed theoretically. Considering the case where a priori information about the signal's global pattern is available, we propose prior LRDS to further improve the reconstruction accuracy. Such improvement is also verified by synthetic experiments. Besides, experiments on several real-world datasets demonstrate the improvement on recovery accuracy of the proposed LRDS over the state-of-the-art spatio-temporal signal recovery methods.
+DA  - 2018/12//
+PY  - 2018
+DO  - 10.1109/TSP.2018.2875886
+DP  - IEEE Xplore
+VL  - 66
+IS  - 23
+SP  - 6281
+EP  - 6296
+SN  - 1941-0476
+UR  - https://ieeexplore.ieee.org/document/8491381
+Y2  - 2025/04/03/14:17:09
+L1  - https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=8491381&ref=
+L2  - https://ieeexplore.ieee.org/document/8491381
+KW  - Correlation
+KW  - differential smoothness
+KW  - graph signal
+KW  - Image reconstruction
+KW  - low rank
+KW  - Ocean temperature
+KW  - Sea surface
+KW  - Signal processing
+KW  - signal recovery
+KW  - Spatio-temporal signal
+KW  - Temperature sensors
+ER  -
+
+TY  - GEN
+TI  - Communities in the Kuramoto Model: Dynamics and Detection via Path Signatures
+AU  - Nguyên, Tâm Johan
+AU  - Lee, Darrick
+AU  - Stolz, Bernadette Jana
+AB  - The behavior of multivariate dynamical processes is often governed by underlying structural connections that relate the components of the system. For example, brain activity which is often measured via time series is determined by an underlying structural graph, where nodes represent neurons or brain regions and edges represent cortical connectivity. Existing methods for inferring structural connections from observed dynamics, such as correlation-based or spectral techniques, may fail to fully capture complex relationships in high-dimensional time series in an interpretable way. Here, we propose the use of path signatures a mathematical framework that encodes geometric and temporal properties of continuous paths to address this problem. Path signatures provide a reparametrization-invariant characterization of dynamical data and, in particular, can be used to compute the lead matrix which reveals lead-lag phenomena. We showcase our approach on time series from coupled oscillators in the Kuramoto model defined on a stochastic block model graph, termed the Kuramoto stochastic block model (KSBM). Using mean-field theory and Gaussian approximations, we analytically derive reduced models of KSBM dynamics in different temporal regimes and theoretically characterize the lead matrix in these settings. Leveraging these insights, we propose a novel signature-based community detection algorithm, achieving exact recovery of structural communities from observed time series in multiple KSBM instances. Our results demonstrate that path signatures provide a novel perspective on analyzing complex neural data and other high-dimensional systems, explicitly exploiting temporal functional relationships to infer underlying structure.
+DA  - 2025/03/25/
+PY  - 2025
+DO  - 10.48550/arXiv.2503.17546
+DP  - arXiv.org
+PB  - arXiv
+ST  - Communities in the Kuramoto Model
+UR  - http://arxiv.org/abs/2503.17546
+Y2  - 2025/05/02/14:03:02
+L1  - http://arxiv.org/pdf/2503.17546v2
+L2  - https://arxiv.org/abs/2503.17546
+N1  - Comment: 46 pages, 13 figures
+KW  - Computer Science - Machine Learning
+KW  - Condensed Matter - Disordered Systems and Neural Networks
+KW  - Nonlinear Sciences - Adaptation and Self-Organizing Systems
+KW  - Quantitative Biology - Neurons and Cognition
+KW  - Quantitative Biology - Quantitative Methods
+KW  - Statistics - Machine Learning
+ER  -
+
+TY  - JOUR
+TI  - Learning Heat Diffusion Graphs
+AU  - Thanou, Dorina
+AU  - Dong, Xiaowen
+AU  - Kressner, Daniel
+AU  - Frossard, Pascal
+T2  - IEEE Transactions on Signal and Information Processing over Networks
+DA  - 2017/09//
+PY  - 2017
+DO  - 10.1109/TSIPN.2017.2731164
+DP  - DOI.org (Crossref)
+VL  - 3
+IS  - 3
+SP  - 484
+EP  - 499
+J2  - IEEE Trans. on Signal and Inf. Process. over Networks
+SN  - 2373-776X, 2373-7778
+UR  - http://ieeexplore.ieee.org/document/7990049/
+Y2  - 2025/05/02/14:03:36
+L1  - https://arxiv.org/pdf/1611.01456
+ER  -
+
+TY  - JOUR
+TI  - Geometric structure of graph Laplacian embeddings
+AU  - Trillos, Nicolás García
+AU  - Hoffmann, Franca
+AU  - Hosseini, Bamdad
+T2  - J. Mach. Learn. Res.
+AB  - We analyze the spectral clustering procedure for identifying coarse structure in a data set X1, . . . , Xn, and in particular study the geometry of graph Laplacian embeddings which form the basis for spectral clustering algorithms. More precisely, we assume that the data are sampled from a mixture model supported on a manifold M embedded in ℝd, and pick a connectivity length-scale ε &gt; 0 to construct a kernelized graph Laplacian. We introduce a notion of a well-separated mixture model which only depends on the model itself, and prove that when the model is well separated, with high probability the embedded data set concentrates on cones that are centered around orthogonal vectors. Our results are meaningful in the regime where ε = ε(n) is allowed to decay to zero at a slow enough rate as the number of data points grows. This rate depends on the intrinsic dimension of the manifold on which the data is supported.
+DA  - 2021/01/01/
+PY  - 2021
+DP  - ACM Digital Library
+VL  - 22
+IS  - 1
+SP  - 63:2934
+EP  - 63:2988
+SN  - 1532-4435
+L1  - https://dl.acm.org/doi/pdf/10.5555/3546258.3546321
+ER  -
+
+TY  - CONF
+TI  - Diffusion Kernels on Graphs and Other Discrete Input Spaces
+AU  - Kondor, Risi Imre
+AU  - Lafferty, John D.
+T3  - ICML '02
+C1  - San Francisco, CA, USA
+C3  - Proceedings of the Nineteenth International Conference on Machine Learning
+DA  - 2002/07/08/
+PY  - 2002
+DP  - ACM Digital Library
+SP  - 315
+EP  - 322
+PB  - Morgan Kaufmann Publishers Inc.
+SN  - 978-1-55860-873-3
+Y2  - 2025/05/02/
+ER  -
+
+TY  - GEN
+TI  - Modeling Advection on Directed Graphs using Matérn Gaussian Processes for Traffic Flow
+AU  - Maddix, Danielle C.
+AU  - Saad, Nadim
+AU  - Wang, Yuyang
+AB  - The transport of traffic flow can be modeled by the advection equation. Finite difference and finite volumes methods have been used to numerically solve this hyperbolic equation on a mesh. Advection has also been modeled discretely on directed graphs using the graph advection operator [4, 18]. In this paper, we first show that we can reformulate this graph advection operator as a finite difference scheme. We then propose the Directed Graph Advection Mat\'ern Gaussian Process (DGAMGP) model that incorporates the dynamics of this graph advection operator into the kernel of a trainable Mat\'ern Gaussian Process to effectively model traffic flow and its uncertainty as an advective process on a directed graph.
+DA  - 2022/02/17/
+PY  - 2022
+DO  - 10.48550/arXiv.2201.00001
+DP  - arXiv.org
+PB  - arXiv
+UR  - http://arxiv.org/abs/2201.00001
+Y2  - 2025/05/02/14:06:52
+L1  - http://arxiv.org/pdf/2201.00001v3
+L2  - https://arxiv.org/abs/2201.00001
+N1  - Comment: Accepted at the Machine Learning and Physical Sciences NeurIPS 2021 Workshop https://ml4physicalsciences.github.io/2021/files/NeurIPS_ML4PS_2021_13.pdf
+KW  - Computer Science - Numerical Analysis
+KW  - Mathematics - Numerical Analysis
+KW  - Statistics - Machine Learning
+ER  -
+
+TY  - CONF
+TI  - Graph Characterization Using Wave Kernel Trace
+AU  - Aziz, Furqan
+AU  - Wilson, Richard C.
+AU  - Hancock, Edwin R.
+T2  - 2014 22nd International Conference on Pattern Recognition
+AB  - Graph based methods have been successfully used in computer vision for classification and matching. This is due to the fact that shapes can be conveniently represented using graph structures. In this paper we explore the use of a spectral invariant which is based on the wave kernel trace to characterize graphs. The wave kernel is the solution of wave equation defined using the Edge-based Laplacian of a graph. The advantage of using the edge-based Laplacian over its vertex-based counterpart is that it can be used to translate equations from continuous analysis to the discrete graph theoretic domain, that have no meanings if defined using vertex-based Laplacian. To illustrate the utility of the proposed method we apply it to graphs extracted from both three-dimensional shapes and images.
+C3  - 2014 22nd International Conference on Pattern Recognition
+DA  - 2014/08//
+PY  - 2014
+DO  - 10.1109/ICPR.2014.656
+DP  - IEEE Xplore
+SP  - 3822
+EP  - 3827
+UR  - https://ieeexplore.ieee.org/document/6977368
+Y2  - 2025/05/02/14:08:48
+L1  - https://ieeexplore.ieee.org/stampPDF/getPDF.jsp?tp=&arnumber=6977368&ref=
+KW  - Eigenvalues and eigenfunctions
+KW  - Feature extraction
+KW  - Heating
+KW  - Kernel
+KW  - Laplace equations
+KW  - Shape
+KW  - Vectors
+ER  -
+
+TY  - GEN
+TI  - Non-separable Spatio-temporal Graph Kernels via SPDEs
+AU  - Nikitin, Alexander
+AU  - John, S. T.
+AU  - Solin, Arno
+AU  - Kaski, Samuel
+AB  - Gaussian processes (GPs) provide a principled and direct approach for inference and learning on graphs. However, the lack of justified graph kernels for spatio-temporal modelling has held back their use in graph problems. We leverage an explicit link between stochastic partial differential equations (SPDEs) and GPs on graphs, introduce a framework for deriving graph kernels via SPDEs, and derive non-separable spatio-temporal graph kernels that capture interaction across space and time. We formulate the graph kernels for the stochastic heat equation and wave equation. We show that by providing novel tools for spatio-temporal GP modelling on graphs, we outperform pre-existing graph kernels in real-world applications that feature diffusion, oscillation, and other complicated interactions.
+DA  - 2024/12/27/
+PY  - 2024
+DO  - 10.48550/arXiv.2111.08524
+DP  - arXiv.org
+PB  - arXiv
+UR  - http://arxiv.org/abs/2111.08524
+Y2  - 2025/05/02/14:09:41
+L1  - http://arxiv.org/pdf/2111.08524v3
+L2  - https://arxiv.org/abs/2111.08524
+KW  - Computer Science - Machine Learning
+KW  - Statistics - Machine Learning
+ER  -
+
+TY  - GEN
+TI  - Diffusion Maps for Signal Filtering in Graph Learning
+AU  - Hildebrant, Todd
+AB  - This paper explores the application diffusion maps as graph shift operators in understanding the underlying geometry of graph signals. The study evaluates the improvements in graph learning when using diffusion map generated filters to the Markov Variation minimization problem. The paper showcases the effectiveness of this approach through examples involving synthetically generated and real-world temperature sensor data. These examples also compare the diffusion map graph signal model with other commonly used graph signal operators. The results provide new approaches for the analysis and understanding of complex, non-Euclidean data structures.
+DA  - 2023/12/22/
+PY  - 2023
+DO  - 10.48550/arXiv.2312.14758
+DP  - arXiv.org
+PB  - arXiv
+UR  - http://arxiv.org/abs/2312.14758
+Y2  - 2025/05/02/14:10:03
+L1  - http://arxiv.org/pdf/2312.14758v1
+L2  - https://arxiv.org/abs/2312.14758
+KW  - Computer Science - Machine Learning
+KW  - Electrical Engineering and Systems Science - Signal Processing
+ER  -
+
+TY  - JOUR
+TI  - Laplacian Eigenmaps for Dimensionality Reduction and Data Representation
+AU  - Belkin, Mikhail
+AU  - Niyogi, Partha
+T2  - Neural Computation
+AB  - One of the central problems in machine learning and pattern recognition is to develop appropriate representations for complex data. We consider the problem of constructing a representation for data lying on a low-dimensional manifold embedded in a high-dimensional space. Drawing on the correspondence between the graph Laplacian, the Laplace Beltrami operator on the manifold, and the connections to the heat equation, we propose a geometrically motivated algorithm for representing the high-dimensional data. The algorithm provides a computationally efficient approach to nonlinear dimensionality reduction that has locality-preserving properties and a natural connection to clustering. Some potential applications and illustrative examples are discussed.
+DA  - 2003/06//
+PY  - 2003
+DO  - 10.1162/089976603321780317
+DP  - IEEE Xplore
+VL  - 15
+IS  - 6
+SP  - 1373
+EP  - 1396
+SN  - 0899-7667
+UR  - https://ieeexplore.ieee.org/document/6789755
+Y2  - 2025/05/02/14:10:39
+L2  - https://ieeexplore.ieee.org/document/6789755
+ER  -
