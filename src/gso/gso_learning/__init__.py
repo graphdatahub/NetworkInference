@@ -1,4 +1,5 @@
-from .mle_learning import estimate_laplacian_mle
+from .mle_learning import relaxed_mle_laplacian, GraphLaplacianEstimator, GraphLaplacianEstimatorBis
 from .visualize_attrnet import plot_attributed_graph
+# from .mle_learning_bis import GraphLaplacianEstimator as GraphLaplacianEstimatorBis
 
-__all__ = ["estimate_laplacian_mle", "plot_attributed_graph"]
+__all__ = ["relaxed_mle_laplacian", "plot_attributed_graph", "GraphLaplacianEstimator", "GraphLaplacianEstimatorBis"]

@@ -28,10 +28,15 @@ def plot_attributed_graph(
     node_size=200,
     line_width=2,
     min_edge_width=1.5,
+    positions=None,
+    layout="spring",
     elev=30,
     azim=45,
+    dpi=300,
     figsize=(10, 5),
+    seed=42,
     fig_title=None,
+    show_plot=True,
     save_format="png",
 ):
     """
@@ -56,11 +61,23 @@ def plot_attributed_graph(
     k = k if k is not None else default_k
 
     # Generate 3D layout with z=0 plane
-    pos = nx.spring_layout(G, dim=3, seed=42, iterations=200, k=k)
+    if positions is None:
+        if layout == "spring":
+            pos = nx.spring_layout(G, dim=3, seed=seed, iterations=200, k=k)
+        elif layout == "kamada-kawai":
+            pos = nx.kamada_kawai_layout(G, dim=3)
+        elif layout == "spectral":
+            pos = nx.spectral_layout(G, dim=3)
+        else:
+            raise ValueError("Choose from 'spring', 'kamada-kawai', 'spectral'")
     for node in pos:
         pos[node][0] *= stretch_x
         pos[node][1] *= stretch_y
-        pos[node][2] = 0
+        
+        if len(pos[node]) < 3:
+            np.append(pos[node], 0)
+        else:
+            pos[node][2] = 0
 
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111, projection="3d")
@@ -127,8 +144,9 @@ def plot_attributed_graph(
 
     if fig_title:
         if save_format == "png":
-            plt.savefig(f"{fig_title}.png", dpi=300, bbox_inches="tight")
+            plt.savefig(f"{fig_title}.png", dpi=dpi, bbox_inches="tight")
         elif save_format in ["svg", "pdf"]:
             plt.savefig(f"{fig_title}.{save_format}", bbox_inches="tight")
-
+    if show_plot:
+        plt.show()
     return ax

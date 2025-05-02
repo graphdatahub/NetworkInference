@@ -10,6 +10,10 @@
 # Allow directory structure but not files
 !.*/
 
+# Only push notebooks (and csv files globally)
+notebook/*
+!notebook/*.ipynb
+!*.csv
 
 # Operating System Files
 # ----------------------
