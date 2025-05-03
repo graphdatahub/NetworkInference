@@ -1,10 +1,10 @@
 # Inferring Dependencies in Infrastructure Networks
 
-1. Network vs. samnple size: How to learn with rank deficient covariance matrices?
+1. Network vs. sample size: How to learn with rank deficient covariance matrices?
 2. Directionality and spatial embedding of dependencies: How to infer directionality from observed data? How to incorporate spatial constraints in the inference task, and is it needed beyond adjacencies?
 3. How to leverage structurial prior knowledge (approximate edge weights, flow estimations and/or known eigenvectors), which can help as initial guess, regularization and/or spectral constraint?
 4. Data integration:
-   + Sparse data: Less data than nodes (only specific nodes are monitored, e.g. sensors for water quality in WDSs). Question of uncertainty and reconstruction under partial coverage.
+   + Sparse data: Less data than nodes (only specific nodes are monitored, e.g. sensors for water quality in WDSs). Question of uncertainty and reconstruction under partial coverage (apply mask on data model). How to optimize sensor placement for (i) contamination detection and source identification, but also (ii) for most accurate flow reconstruction and identifiable models in general.
    + Big data streams: What strategies enable scalable inference and data integration for large data over networks? How can we efficiently integrate new data?
 6. Processes underlying the data (assumed):
    + How to model linear, diffusive-like processes (e.g., propagation of pollutants) over networks?
