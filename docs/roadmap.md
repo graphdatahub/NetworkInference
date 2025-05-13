@@ -21,6 +21,7 @@
 Compare results to that of the Laplacian we get from hydraulic parameter-dervied weights:
 * hydraulic resistance (R) or its inverse, hydraulic conductance (1/R)
 * Effective potential difference, based on elevation
+
 Here we consider a system without pump. Maybe we can consider flow control valves.
 
 **Approximation for Large Finite Systems**
