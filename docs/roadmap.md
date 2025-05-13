@@ -16,7 +16,15 @@
    + How can we decompose a signal in different modes?
    + How can we analyze shifts in stability region?
 
-**Approximation for large finite systems:**
+**EPANET Study Case**
+
+Compare results to that of the Laplacian we get from hydraulic parameter-dervied weights:
+* hydraulic resistance (R) or its inverse, hydraulic conductance (1/R)
+* Effective potential difference, based on elevation
+Here we consider a system without pump. Maybe we can consider flow control valves.
+
+**Approximation for Large Finite Systems**
+
 * A primary approach involves investigating the mean field limit of kernels. By replacing complex interactions among many variables with an average representation of the other, the problem's complexity can be significantly reduced by neglecting higher-order correlations and fluctuations. Of course, the decision to use a mean-field approximation should align with the goals of using the specific kernel, since it works under the assumptions of homogeneity, exchangeability of variables, and weak, long-range interactions.
 * Sampling-based techniques: ...
 * Divide-and-conquer approaches:
