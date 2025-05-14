@@ -16,7 +16,7 @@
      We leverage the fact that graph Laplacians are discrete approximations of the Laplace-Beltrami on a manifold, and we assume that graph signals emanate from a specific type of process (from simple diffusion to Schrodinger-type interference), that they should approximate best for a specific scale $t$ (allowing us to account for both direct and non-direct contributions explaining the data, from a same Laplacian, depending on how far along the process is).  
 8. How to validate inferred dependencies, especially under partial observability and model misspecification?
 9. How can inferred networks support real-time monitoring, risk assessment, and decision-making?
-   + How can we decompose a signal in different modes?
+   + How can we decompose a signal in different modes, and leverage the spectral geometry of the learned graph?
    + How can we analyze shifts in stability region?
 
 **EPANET Study Case**
