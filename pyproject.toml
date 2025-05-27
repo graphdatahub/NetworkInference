@@ -37,6 +37,7 @@ test = ["pytest>=7.0"]
 [tool.ruff]
 line-length = 90
 include = ["src/**/*.py", "src/**/*.pyi", "src/**/*.ipynb"]
+exclude = ["**/.*"]
 
 [tool.ruff.lint]
 extend-select = ["B", "I", "RUF", "UP"]
@@ -55,5 +56,6 @@ pretty = true
 files = ["src/"]
 exclude = [
     "^build/",
-    "^src/tests/"
+    "^src/tests/",
+    "^\\..*"
 ]
