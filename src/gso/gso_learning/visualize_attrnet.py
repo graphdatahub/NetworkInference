@@ -73,7 +73,7 @@ def plot_attributed_graph(
     for node in pos:
         pos[node][0] *= stretch_x
         pos[node][1] *= stretch_y
-        
+
         if len(pos[node]) < 3:
             np.append(pos[node], 0)
         else:
