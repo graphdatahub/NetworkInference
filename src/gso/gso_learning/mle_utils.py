@@ -1,5 +1,5 @@
 from typing import Any
-
+from numba import jit
 import numpy as np
 
 
@@ -74,3 +74,12 @@ def laplacian_error_metrics(
         "spectral_error": spec_err,
         "subspace_error": subsp_err,
     }
+
+@jit(nopython=True, fastmath=True)
+def compute_sample_cov(X, rowvar=True):
+    if not rowvar:
+        X = X.T
+    n, p = X.shape
+    X_centered = X - X.mean(axis=0)
+    S = X_centered.T @ X_centered / (n - 1)
+    return S

@@ -156,7 +156,7 @@ def block_descent(
     default_params = {
         "alpha": 0.1,  # CGL regularization
         "lambda": 0.0,  # sparsity lambda
-        "prob_tol": 1e-4,
+        "prob_tol": 1e-8,
         "inner_tol": 1e-6,
         "max_cycle": 100,
         "shift_delay": 3,
