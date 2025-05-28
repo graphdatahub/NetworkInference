@@ -1,6 +1,7 @@
 from typing import Any
-from numba import jit
+
 import numpy as np
+from numba import jit
 
 
 def soft_threshold(x: np.ndarray, threshold: float) -> np.ndarray:
@@ -50,15 +51,19 @@ def laplacian_error_metrics(
     Returns:
         dict: Dictionary with keys 'frobenius_error', 'spectral_error', 'subspace_error'.
     """
+    diff = L_true - L_est
+    if np.isnan(diff).any() or np.isinf(diff).any():
+        raise RuntimeError("Invalid input matrices")
+
     # Frobenius norm of the difference
-    frob_err = np.linalg.norm(L_true - L_est, ord="fro")
+    frob_err = np.linalg.norm(diff, ord="fro")
 
     # Spectral norm (largest singular value) of the difference
-    spec_err = np.linalg.norm(L_true - L_est, ord=2)
+    spec_err = np.linalg.norm(diff, ord=2)
 
     # Subspace error as Frobenius norm of difference of projection matrices
-    eigvals_true, eigvecs_true = np.linalg.eigh(L_true)
-    eigvals_est, eigvecs_est = np.linalg.eigh(L_est)
+    _, eigvecs_true = np.linalg.eigh(L_true)
+    _, eigvecs_est = np.linalg.eigh(L_est)
     if k is not None:
         U_true = eigvecs_true[:, :k]
         U_est = eigvecs_est[:, :k]
@@ -74,6 +79,7 @@ def laplacian_error_metrics(
         "spectral_error": spec_err,
         "subspace_error": subsp_err,
     }
+
 
 @jit(nopython=True, fastmath=True)
 def compute_sample_cov(X, rowvar=True):

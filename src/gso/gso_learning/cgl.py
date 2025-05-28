@@ -1,101 +1,217 @@
 import numpy as np
-from numba import njit, prange
-from qpsolvers import solve_qp
 
-@njit(fastmath=True, cache=True)
-def update_sherman_morrison_diag(O, C, delta, idx):
-    v = np.zeros(O.shape[0])
-    v[idx] = 1.0
-    Cv = C @ v
-    denom = 1.0 + delta * Cv[idx]
-    C_new = C - np.outer(Cv, Cv) * delta / denom
-    O_new = O.copy()
-    O_new[idx, idx] += delta
-    return O_new, C_new
 
-@njit(fastmath=True, cache=True)
-def process_node(u, n, A_mask, K, O, C):
-    not_u = np.delete(np.arange(n), u)
-    mask = A_mask[not_u, u]
-    
-    if not np.any(mask):
-        # Return empty arrays with proper types and dimensions
-        empty_Q = np.empty((0,0), dtype=np.float64)
-        empty_c = np.empty(0, dtype=np.float64)
-        empty_mask = np.empty(0, dtype=np.bool_)
-        return empty_Q, empty_c, not_u, empty_mask, 0.0, np.empty((0,0), dtype=np.float64)
-    
-    K_uu = K[u,u]
-    K_u = K[not_u,u]
-    C_uu = C[u,u]
-    C_u = C[not_u,u]
-    O_uu_inv = C[not_u, :][:, not_u] - np.outer(C_u, C_u)/C_uu
-    
-    # Solve QP subproblem setup
-    Q = O_uu_inv[mask, :][:, mask].copy()
-    c = (-K_u[mask]/K_uu - O_uu_inv[mask, :] @ np.ones(len(not_u))/n).copy()
-    
-    return Q, c, not_u, mask, K_uu, O_uu_inv
+def _regularized_lstsq(A, b, reg_lambda=1e-5):
+    """
+    Solve (A^T A + reg_lambda * I) x = A^T b using lstsq for regularization.
+    This is equivalent to Tikhonov (ridge) regularization.
+    """
+    n = A.shape[1]
+    A_reg = np.vstack([A, np.sqrt(reg_lambda) * np.eye(n)])
+    b_reg = np.concatenate([b, np.zeros(n)])
+    x, residuals, rank, s = np.linalg.lstsq(A_reg, b_reg, rcond=None)
+    return x
 
-def solve_node_qp(Q, c):
-    return solve_qp(Q, c, solver='osqp', lb=np.zeros_like(c))
 
-@njit(fastmath=True, parallel=True, cache=True)
-def update_matrices(O, C, u, not_u, mask, x, K_uu, O_uu_inv, n):
-    beta = np.zeros(len(not_u))
-    beta[mask] = x
-    o_u = beta + 1/n
-    o_uu = 1/K_uu + o_u.T @ O_uu_inv @ o_u
-    
-    # Update O matrix
-    O[u,u] = o_uu
-    O[not_u,u] = o_u
-    O[u,not_u] = o_u
-    
-    # Update C matrix using Sherman-Morrison
-    Cu = (O_uu_inv @ o_u) / (o_uu - o_u.T @ O_uu_inv @ o_u)
-    Cuu = 1 / (o_uu - o_u.T @ O_uu_inv @ o_u)
-    
-    C[u,u] = Cuu
-    C[not_u,u] = -Cu
-    C[u,not_u] = -Cu
-    C[not_u, not_u] = O_uu_inv + np.outer(Cu, Cu)/Cuu
-    
-    return O, C
+def _check_kkt_cond(grad, x):
+    num = np.abs(grad) * (grad > 1e-12)
+    score = num.copy()
+    Pc = num < 1e-12
+    if np.any(Pc):
+        score[Pc] = num[Pc]
+    if np.any(~Pc):
+        score[~Pc] = num[~Pc] / (x[~Pc] + 1e-12)
+    Pc = (num < 1e-12) | (score < 1)
+    P = ~Pc
+    kktP = np.max(np.abs(x[P])) if np.any(P) else 0
+    kktPc = np.max(np.abs(grad[Pc])) if np.any(Pc) else 0
+    N = x < -1e-12
+    kktN = np.max(np.abs(x[N])) if np.any(N) else 0
+    return max(kktP, kktPc, kktN)
 
-def cgl_fit(S, A_mask=None, alpha=0.1, max_iter=100, tol=1e-4):
-    n = S.shape[0]
-    A_mask = np.ones((n,n), dtype=np.bool_) if A_mask is None else A_mask
-    
-    # Initialize matrices
-    O = np.diag(1/(np.diag(S) + alpha))
-    C = np.diag(1/np.diag(O))
-    e = np.ones(n)
-    K = S + alpha * (2*np.eye(n) - np.outer(e, e))
-    
-    for cycle in range(max_iter):
-        O_prev = O.copy()
-        
-        # Parallel loop over nodes
-        for u in prange(n):
-            Q, c, not_u, mask, K_uu, O_uu_inv = process_node(u, n, A_mask, K, O, C)
-            
-            if mask.size == 0:
-                continue
-                
-            x = solve_node_qp(Q, c)  # Python solver call
-            
-            # Thread-safe matrix updates
-            with numba.objmode(O='float64[:,:]', C='float64[:,:]'):
-                O, C = update_matrices(O.copy(), C.copy(), u, not_u, mask, x, 
-                                     K_uu, O_uu_inv, n)
 
-        if np.linalg.norm(O - O_prev, 'fro') / np.linalg.norm(O_prev, 'fro') < tol:
+def _nonnegative_qp_solver(A, b, inner_tol=1e-6, maxiter=200, reg_lambda=1e-5):
+    p = A.shape[1]
+    x = np.zeros(p)
+    lambda_ = -b.copy()
+    F = np.zeros(p, dtype=np.bool_)
+    Lambda = ~F
+    iter_ = 0
+    check = _check_kkt_cond(lambda_, x)
+    while check > inner_tol and iter_ < maxiter:
+        fH1 = x < -1e-12
+        H1 = fH1 & F
+        fH2 = lambda_ < -1e-12
+        H2 = fH2 & Lambda
+        H1H2 = H1 | H2
+        if np.sum(H1H2) == 0:
             break
 
-    # Final Laplacian constraints
-    O = (O + O.T) / 2
-    np.fill_diagonal(O, 0)
-    np.fill_diagonal(O, -np.sum(O, axis=1))
-    
+        idx = np.where(H1H2)[0][-1]
+        if H1[idx]:
+            F[idx] = False
+            Lambda[idx] = True
+        else:
+            F[idx] = True
+            Lambda[idx] = False
+        active = np.where(F)[0]
+
+        if active.size > 0:
+            # Use regularized least squares for stability
+            x[active] = _regularized_lstsq(
+                A[np.ix_(active, active)], b[active], reg_lambda=reg_lambda
+            )
+
+        x[~F] = 0
+        lambda_[Lambda] = A[np.ix_(Lambda, F)] @ x[F] - b[Lambda]
+        lambda_[F] = 0.9 * 1e-12
+        iter_ += 1
+        check = _check_kkt_cond(lambda_, x)
+    return x
+
+
+def _update_sherman_morrison_diag(O, C, shift, idx, tol=1e-10):
+    O[idx, idx] += shift
+    c_d = C[idx, idx]
+    denom = 1 + shift * c_d
+    if np.abs(denom) < tol:
+        return O, C
+    C -= (np.outer(C[:, idx], C[idx, :]) * shift) / denom
     return O, C
+
+
+def _initialize_params(S, alpha, prob_tol, regularization_type):
+    n = S.shape[0]
+    e_v = np.ones(n) / np.sqrt(n)
+    dc_var = e_v @ S @ e_v
+    isshifting = np.abs(dc_var) < prob_tol
+    if isshifting:
+        S = S + np.eye(n) / n
+    if regularization_type == 1:
+        H_alpha = alpha * (2 * np.eye(n) - np.ones((n, n)))
+    elif regularization_type == 2:
+        H_alpha = alpha * (np.eye(n) - np.ones((n, n)))
+    else:
+        raise ValueError("regularization_type must be 1 or 2")
+    K = S + H_alpha
+    return n, K
+
+
+def _initialize_matrices(K):
+    O = np.diag(1.0 / np.diag(K))
+    C = np.diag(np.diag(K))
+    return O, C
+
+
+def _block_update(O, C, K, A_mask, n, inner_tol, reg_lambda=1e-5):
+    for u in range(n):
+        minus_u = np.array([i for i in range(n) if i != u])
+        k_u = K[minus_u, u]
+        k_uu = K[u, u]
+        c_u = C[minus_u, u]
+        c_uu = C[u, u]
+        Ou_i = C[np.ix_(minus_u, minus_u)] - np.outer(c_u, c_u) / c_uu
+        beta = np.zeros(n - 1)
+        ind_nz = A_mask[minus_u, u] == 1
+        A_nnls = Ou_i[np.ix_(ind_nz, ind_nz)]
+        b = k_u / k_uu + (1 / n) * Ou_i @ np.ones(n - 1)
+        b_nnls = b[ind_nz]
+
+        if A_nnls.shape[0] > 0:
+            out_x = -_nonnegative_qp_solver(
+                A_nnls, b_nnls, inner_tol, reg_lambda=reg_lambda
+            )
+            beta[ind_nz] = out_x
+
+        o_u = beta + (1 / n)
+        o_uu = (1 / k_uu) + o_u @ Ou_i @ o_u
+
+        denom = o_uu - o_u @ Ou_i @ o_u
+        if np.abs(denom) < 1e-10:
+            denom = 1e-10
+
+        cu = (Ou_i @ o_u) / denom
+        cuu = 1.0 / denom
+
+        O[u, u] = o_uu
+        O[minus_u, u] = o_u
+        O[u, minus_u] = o_u
+        C[u, u] = cuu
+        C[u, minus_u] = -cu
+        C[minus_u, u] = -cu
+        C[np.ix_(minus_u, minus_u)] = Ou_i + np.outer(cu, cu) / cuu
+    return O, C
+
+
+def cgl_fit(
+    S,
+    A_mask,
+    alpha=0.1,
+    prob_tol=1e-4,
+    inner_tol=1e-6,
+    max_cycle=20,
+    regularization_type=1,
+    reg_lambda=1e-5,
+):
+    n, K = _initialize_params(S, alpha, prob_tol, regularization_type)
+    O, C = _initialize_matrices(K)
+    O_best = O.copy()
+    C_best = C.copy()
+    frob_norm = []
+    converged = False
+    cycle = 0
+
+    while not converged and cycle < max_cycle:
+        O_old = O.copy()
+        O, C = _block_update(O, C, K, A_mask, n, inner_tol, reg_lambda=reg_lambda)
+
+        _check_validity(O, name="precision matrix (post-BU)")
+        _check_validity(C, name="covariance matrix (post-BU)")
+
+        if cycle > 3:
+            d_shifts = O @ np.ones(n) - 1
+            large_diag_idx = np.where(np.abs(d_shifts) > 1e-12)[0]
+            for idx in large_diag_idx:
+                O, C = _update_sherman_morrison_diag(O, C, -d_shifts[idx], idx)
+
+                _check_validity(O, name="precision matrix (post-SM)")
+                _check_validity(C, name="covariance matrix (post-SM)")
+
+        O_best = O.copy()
+        C_best = C.copy()
+        cycle += 1
+        frob_norm.append(np.linalg.norm(O_old - O, "fro") / np.linalg.norm(O_old, "fro"))
+
+        if cycle > 5 and frob_norm[-1] < prob_tol:
+            converged = True
+            O_best = O.copy()
+            C_best = C.copy()
+
+    O = O_best - (1 / n)
+    C = C_best - (1 / n)
+
+    return {
+        "O": O,
+        "C": C,
+        "convergence": {
+            "frob_norms": np.array(frob_norm),
+            "converged": converged,
+            "cycles": cycle,
+        },
+    }
+
+
+def _check_validity(matrix, name="matrix"):
+    """Raise a RuntimeError if matrix contains NaN or Inf values."""
+    has_nan = np.isnan(matrix).any()
+    has_inf = np.isinf(matrix).any()
+    if has_nan or has_inf:
+        msg = f"Invalid {name}: contains"
+        if has_nan:
+            msg += " NaN"
+        if has_nan and has_inf:
+            msg += " and"
+        if has_inf:
+            msg += " Inf"
+        msg += " values"
+        raise RuntimeError(msg)
