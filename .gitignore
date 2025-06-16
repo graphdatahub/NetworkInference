@@ -1,6 +1,6 @@
 # Global Dotfile Exclusion (with exceptions)
 # ------------------------------------------
-.*
+**/.*
 !.gitignore
 !.pre-commit-config.yaml
 !.python-version
@@ -25,8 +25,8 @@
 *.ipynb
 
 # --- EXCEPTIONS ---
-!notebooks/**/*.html
 !notebooks/**/*.ipynb
+!notebooks/**/*.html
 !docs/**/*.md
 !docs/**/*.html
 !docs/**/*.pdf
