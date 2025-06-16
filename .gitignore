@@ -11,34 +11,6 @@
 !.*/
 
 
-# File Type-specific Exclusions
-# -----------------------------
-*.json
-*.csv
-*.pdf
-*.png
-*.md
-*.org
-*.tex
-*.jpeg
-*.html
-*.ipynb
-
-# --- EXCEPTIONS ---
-!notebooks/**/*.ipynb
-!notebooks/**/*.html
-!docs/**/*.md
-!docs/**/*.html
-!docs/**/*.pdf
-!config/**/*.json
-!data/**/*.json
-!data/**/*.csv
-!data/**/*.pickle
-!results/**/*.json
-!results/**/*.csv
-!results/**/*.pickle
-
-
 # Operating System Files
 # ----------------------
 # Windows
@@ -145,3 +117,31 @@ uv.lock
 # -------------
 node_modules/
 package-lock.json
+
+
+# File Type-specific Exclusions
+# -----------------------------
+*.json
+*.csv
+*.pdf
+*.png
+*.md
+*.org
+*.tex
+*.jpeg
+*.html
+*.ipynb
+
+# --- EXCEPTIONS ---
+!notebooks/**/*.ipynb
+!notebooks/**/*.html
+!docs/**/*.md
+!docs/**/*.html
+!docs/**/*.pdf
+!config/**/*.json
+!data/**/*.json
+!data/**/*.csv
+!data/**/*.pickle
+!results/**/*.json
+!results/**/*.csv
+!results/**/*.pickle
