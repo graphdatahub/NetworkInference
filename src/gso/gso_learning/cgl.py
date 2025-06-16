@@ -84,17 +84,22 @@ def _initialize_params(S, alpha, prob_tol, regularization_type):
     n = S.shape[0]
     e_v = np.ones(n) / np.sqrt(n)
     dc_var = e_v @ S @ e_v
+
     isshifting = np.abs(dc_var) < prob_tol
     if isshifting:
-        S = S + np.eye(n) / n
+        # S = S + np.eye(n) / n
+        S = S + (1 / n)
+
     if regularization_type == 1:
         H_alpha = alpha * (2 * np.eye(n) - np.ones((n, n)))
     elif regularization_type == 2:
         H_alpha = alpha * (np.eye(n) - np.ones((n, n)))
     else:
         raise ValueError("regularization_type must be 1 or 2")
+
     K = S + H_alpha
-    return n, K
+
+    return n, K, isshifting
 
 
 def _initialize_matrices(K):
@@ -153,7 +158,7 @@ def cgl_fit(
     regularization_type=1,
     reg_lambda=1e-5,
 ):
-    n, K = _initialize_params(S, alpha, prob_tol, regularization_type)
+    n, K, isshifting = _initialize_params(S, alpha, prob_tol, regularization_type)
     O, C = _initialize_matrices(K)
     O_best = O.copy()
     C_best = C.copy()
@@ -187,8 +192,14 @@ def cgl_fit(
             O_best = O.copy()
             C_best = C.copy()
 
-    O = O_best - (1 / n)
-    C = C_best - (1 / n)
+    if isshifting:
+        # O = O_best - np.eye(n) / n
+        # C = C_best - np.eye(n) / n
+        O = O_best - (1 / n)
+        C = C_best - (1 / n)
+    else:
+        O = O_best
+        C = C_best
 
     return {
         "O": O,
@@ -201,7 +212,7 @@ def cgl_fit(
     }
 
 
-def _check_validity(matrix, name="matrix"):
+def _check_validity(matrix, name="matrix", tol=1e-8):
     """Raise a RuntimeError if matrix contains NaN or Inf values."""
     has_nan = np.isnan(matrix).any()
     has_inf = np.isinf(matrix).any()

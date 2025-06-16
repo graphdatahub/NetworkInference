@@ -10,10 +10,34 @@
 # Allow directory structure but not files
 !.*/
 
-# Only add notebooks (and csv files globally)
-notebooks/*
-!notebooks/*.ipynb
-!*.csv
+
+# File Type-specific Exclusions
+# -----------------------------
+*.json
+*.csv
+*.pdf
+*.png
+*.md
+*.org
+*.tex
+*.jpeg
+*.html
+*.ipynb
+
+# --- EXCEPTIONS ---
+!notebooks/**/*.html
+!notebooks/**/*.ipynb
+!docs/**/*.md
+!docs/**/*.html
+!docs/**/*.pdf
+!config/**/*.json
+!data/**/*.json
+!data/**/*.csv
+!data/**/*.pickle
+!results/**/*.json
+!results/**/*.csv
+!results/**/*.pickle
+
 
 # Operating System Files
 # ----------------------
