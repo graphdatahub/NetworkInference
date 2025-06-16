@@ -145,3 +145,17 @@ package-lock.json
 !results/**/*.json
 !results/**/*.csv
 !results/**/*.pickle
+
+# --- RE-IGNORE dotfiles in exception folders ---
+notebooks/**/.*.ipynb
+notebooks/**/.*.html
+docs/**/.*.md
+docs/**/.*.html
+docs/**/.*.pdf
+config/**/.*.json
+data/**/.*.json
+data/**/.*.csv
+data/**/.*.pickle
+results/**/.*.json
+results/**/.*.csv
+results/**/.*.pickle
